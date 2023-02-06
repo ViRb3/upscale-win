@@ -19,6 +19,7 @@ from runtime.vsmlrt.vsmlrt import CUGAN, RIFE, Backend
 core.num_threads = 2
 target_width: int = 1920
 target_height: int = 1080
+pad: bool = False
 target_scale: int = 2
 scale_func = core.resize.Lanczos
 interpolate_factor: int = 2
@@ -42,9 +43,9 @@ def eprint(*args, **kwargs):
     print(*args, file=sys.stderr, **kwargs)
 
 
-def rescale_pad(clip, target_width: int, target_height: int):
+def rescale(clip, target_width: int, target_height: int, pad: bool):
     """
-    Rescale to target dimensions by padding with black pixels where necessary.
+    Rescale to target dimensions, optionally padding with black pixels where necessary.
     Transforms non-square pixels to square (1:1 SAR).
     """
     # transform non-square pixels to square
@@ -66,23 +67,24 @@ def rescale_pad(clip, target_width: int, target_height: int):
         fixed_width * size_factor,
         fixed_height * size_factor,
     )
-    # pad to match second dimension
-    border_l = 0
-    border_r = 0
-    border_t = 0
-    border_b = 0
-    if matched_width:
-        # https://github.com/vapoursynth/vapoursynth/blob/2ee76bc5163d546e6a296142a6664a29fe7df165/src/core/simplefilters.cpp#L311
-        divisor = 1 << clip.format.subsampling_h
-        border_count = (target_height - clip.height) // divisor
-        border_t = (border_count // 2) * divisor
-        border_b = ceil(border_count / 2) * divisor
-    else:
-        divisor = 1 << clip.format.subsampling_w
-        border_count = (target_width - clip.width) // divisor
-        border_l = (border_count // 2) * divisor
-        border_r = ceil(border_count / 2) * divisor
-    clip = core.std.AddBorders(clip, border_l, border_r, border_t, border_b)
+    if pad:
+        # pad to match second dimension
+        border_l = 0
+        border_r = 0
+        border_t = 0
+        border_b = 0
+        if matched_width:
+            # https://github.com/vapoursynth/vapoursynth/blob/2ee76bc5163d546e6a296142a6664a29fe7df165/src/core/simplefilters.cpp#L311
+            divisor = 1 << clip.format.subsampling_h
+            border_count = (target_height - clip.height) // divisor
+            border_t = (border_count // 2) * divisor
+            border_b = ceil(border_count / 2) * divisor
+        else:
+            divisor = 1 << clip.format.subsampling_w
+            border_count = (target_width - clip.width) // divisor
+            border_l = (border_count // 2) * divisor
+            border_r = ceil(border_count / 2) * divisor
+        clip = core.std.AddBorders(clip, border_l, border_r, border_t, border_b)
     return clip
 
 
@@ -96,8 +98,8 @@ props = clip.get_frame(0).props
 if props.get("_FieldBased", 0) != 0:
     raise Exception("Video is interlaced, deinterlace it first.")
 
-# rescale to optmal dimensions for model
-clip = rescale_pad(clip, target_width // target_scale, target_height // target_scale)
+# rescale to produce target dimensions after upscale
+clip = rescale(clip, target_width // target_scale, target_height // target_scale, pad)
 
 if interpolate_factor > 1:
     # skip interpolating on scene change
