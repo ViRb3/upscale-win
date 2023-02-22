@@ -6,13 +6,14 @@ A workflow for upscaling and interpolating videos with NVIDIA TensorRT accelerat
 
 1. Download and extract all external dependencies:
 
-   | Source                                                       | Files             | Destination                      |
-   | ------------------------------------------------------------ | ----------------- | -------------------------------- |
-   | [vsmlrt-windows-x64-cuda.v13.7z](https://github.com/AmusementClub/vs-mlrt/releases/download/v13/vsmlrt-windows-x64-cuda.v13.7z) | \*                | .\runtime\vsmlrt\                |
-   | [python-3.10.10-embed-amd64.zip](https://www.python.org/ftp/python/3.10.10/python-3.10.10-embed-amd64.zip) | \*                | .\runtime\                       |
-   | [VapourSynth64-Portable-R61.7z](https://github.com/vapoursynth/vapoursynth/releases/download/R61/VapourSynth64-Portable-R61.7z) | \*                | .\runtime\                       |
-   | [vsutil-0.8.0.zip](https://github.com/Irrational-Encoding-Wizardry/vsutil/archive/refs/tags/0.8.0.zip) | .\vsutil\         | .\runtime\                       |
-   | [vivtc-r1.7z](https://github.com/vapoursynth/vivtc/releases/download/R1/vivtc-r1.7z) | .\win64\VIVTC.dll | .\runtime\vapoursynth64\plugins\ |
+   | Source                                                       | Files              | Destination                      |
+   | ------------------------------------------------------------ | ------------------ | -------------------------------- |
+   | [vsmlrt-windows-x64-cuda.v13.7z](https://github.com/AmusementClub/vs-mlrt/releases/download/v13/vsmlrt-windows-x64-cuda.v13.7z) | \*                 | .\runtime\vsmlrt\                |
+   | [python-3.10.10-embed-amd64.zip](https://www.python.org/ftp/python/3.10.10/python-3.10.10-embed-amd64.zip) | \*                 | .\runtime\                       |
+   | [VapourSynth64-Portable-R61.7z](https://github.com/vapoursynth/vapoursynth/releases/download/R61/VapourSynth64-Portable-R61.7z) | \*                 | .\runtime\                       |
+   | [vsutil-0.8.0.zip](https://github.com/Irrational-Encoding-Wizardry/vsutil/archive/refs/tags/0.8.0.zip) | .\vsutil\          | .\runtime\                       |
+   | [vivtc-r1.7z](https://github.com/vapoursynth/vivtc/releases/download/R1/vivtc-r1.7z) | .\win64\VIVTC.dll  | .\runtime\vapoursynth64\plugins\ |
+   | [HandBrakeCLI-1.6.1-win-x86_64.zip](https://github.com/HandBrake/HandBrake/releases/download/1.6.1/HandBrakeCLI-1.6.1-win-x86_64.zip) | .\HandBrakeCLI.exe | .\runtime\                       |
 
 1. Download and install plugins:
 
@@ -22,8 +23,9 @@ A workflow for upscaling and interpolating videos with NVIDIA TensorRT accelerat
    .\python.exe .\vsrepo.py -p install ffms2 havsfunc akarin
    ```
 
-1. Start upscaling:
+1. Start upscaling and encoding:
 
    ```powershell
-   & .\batch.ps1 "E:\converted\" "E:\Original\*.mp4"
+   & .\upscale.ps1 "E:\converted\" "E:\Original\*.mp4"
+   & .\encode.ps1 "E:\encoded\" "E:\converted\*.mp4"
    ```
