@@ -26,8 +26,8 @@ prescale_w = 960  # None = disable
 prescale_h = 540  # None = disable
 scale_func = core.resize.Lanczos
 
-colorspace = None  # auto
-# colorspace = [4, 1, 4]  # NTSC (old)
+colorspace = None  # auto detect
+# colorspace = [1, 1, 1]  # HD
 # colorspace = [5, 1, 5]  # PAL
 # colorspace = [6, 1, 6]  # NTSC
 
@@ -151,12 +151,10 @@ if interpolate_factor > 1:
     # skip interpolating on scene change
     clip = core.misc.SCDetect(clip=clip, threshold=0.100)
 
-# default to 1 (BT.709) if prop is None or 2 (undefined)
 if colorspace is None:
-    colorspace = [
-        x if x != 2 else 1
-        for x in [props.get(p, 2) for p in ["_Matrix", "_Transfer", "_Primaries"]]
-    ]
+    colorspace = [props.get(p, 2) for p in ["_Matrix", "_Transfer", "_Primaries"]]
+    if any(p == 2 for p in colorspace):
+        raise Exception("unable to detect colorspace, aborting")
 
 # models only accept RGB, also pad to expected dimensions
 clip = scale_func(
